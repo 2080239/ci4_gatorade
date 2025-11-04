@@ -1,0 +1,160 @@
+body {
+  width: 100%;
+  margin: 0 auto;
+  padding: 0;
+  font-family: "Replica-Mono", monospace;
+  /* CSS file is in /public/css, so asset is one level up */
+  background: url('../asset/background.png') no-repeat center center;
+  background-size: cover;
+}
+
+.gatorade-header {
+  /* path relative to /public/css */
+  background: url("../asset/Rectangle 1.png") no-repeat center center;
+    background-size: cover;
+    height: 90px;
+    width: 89%;
+    margin: 3% auto -3px;
+    border-radius: 2px;
+}
+
+
+
+.header-logo {
+  position: relative;
+  width: 220px;     
+  height: 240.5px;  
+}
+
+.logo-shape {
+    width: 80%;
+    height: 100%;
+    object-fit: contain;
+    transform: rotate(7deg);
+    display: block;
+    margin-top: 36px;
+    position: relative;   
+    z-index: 2; 
+}
+
+.logo-text {
+     position: absolute;
+    font-weight: bold;
+    color: #fff;
+    text-transform: uppercase;
+    transform: rotate(-41deg); 
+    z-index: 2;
+}
+
+
+.gatorade-text {
+    width: 139.2px;
+    height: 145.6px;
+    top: 110.64px;
+    left: 45.7px;
+    font-size: 21px;
+
+}
+
+.fivev5-text {
+width: 141.15px;
+    height: 139.82px;
+    top: 116.38px;
+    left: 69.24px;
+    font-size: 51px;
+    color: #FA5000;
+
+}
+
+
+.header-title {
+  margin: 0 20% 0 -14%;
+    font-family: HW Pano Trial;
+    font-weight: 700;
+    font-style: Bold;
+    font-size: 19px;
+    line-height: 100%;
+    letter-spacing: 0%;
+}
+
+.step-box {
+    width: 236px;
+    height: 60px;          
+  background: #ff4d00;   
+  color: #fff;
+  font-weight: bold;
+  font-size: 16px;
+  line-height: 62px;     
+  text-align: center;
+  text-transform: uppercase;
+    clip-path: polygon(0 0, 75% 0, 94% 100%, 26% 100%);
+  border-radius: 2px;    
+
+
+}
+ .footer-section {
+  
+  position: relative;
+  
+}
+
+.footer-title {
+  
+      font-size: 54px;
+    font-family: "HW Pano Trial", sans-serif;
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: #111;
+  text-transform: uppercase;
+}
+
+.footer-img-left {
+  max-height: 132px;
+  transform: scaleX(-1);
+      position: absolute;
+    top: 31%;
+    left: 0%;
+}
+
+.footer-player {
+  max-height: 308px;
+ 
+    position: absolute;
+      top: 17.4%;
+    left: 6%;
+}
+
+
+
+.footer-links ul li {
+  margin-bottom: 8px;
+}
+
+.footer-links ul li a {
+  text-decoration: none;
+  color: #111;
+ font-family: "Replica Mono", monospace;
+font-weight: 400;
+    font-size: 21px;
+    line-height: 28px;
+  transition: all 0.3s ease-in-out;
+}
+
+.footer-links ul li a:hover {
+  color: #ef5a22;
+  text-decoration: underline;
+}
+
+.footer-copy {
+  color: #555;
+  font-size: 0.85rem;
+}
+
+.footer-logo {
+    bottom: -4px;
+    right: -6px;
+}
+
+.footer-logo img {
+  height: 160px;
+}
