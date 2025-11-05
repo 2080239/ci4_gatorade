@@ -182,6 +182,11 @@ class RegistrationController extends BaseController
      */
     public function all()
     {
+        // Extra safety: only allow admins (route already has 'admin' filter)
+        if (session()->get('user_role') !== 'admin') {
+            return redirect()->to('/login')->with('error', 'Please login as admin to continue.');
+        }
+
         $teamModel = new TeamModel();
         $coachModel = new CoachModel();
         $athleteModel = new AthleteModel();
