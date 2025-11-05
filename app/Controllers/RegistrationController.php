@@ -177,12 +177,10 @@ class RegistrationController extends BaseController
         echo view('layouts/footer');
     }
 
-    /**
-     * Display all registered teams with coach and athletes.
-     */
+    
     public function all()
     {
-        // Extra safety: only allow admins (route already has 'admin' filter)
+        
         if (session()->get('user_role') !== 'admin') {
             return redirect()->to('/login')->with('error', 'Please login as admin to continue.');
         }

@@ -4,7 +4,8 @@
     <h2>All Registrations</h2>
     <div>
       <a href="<?= base_url('register/step1') ?>" class="btn btn-primary">New Registration</a>
-      <a href="<?= base_url('register/complete') ?>" class="btn btn-outline-secondary">Back to Complete</a>
+      
+      <a href="<?= base_url('logout') ?>" class="btn btn-danger">Logout</a>
     </div>
   </div>
 
