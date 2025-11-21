@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="420" height="260" viewBox="0 0 420 260" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="o" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#ef5a22"/>
+      <stop offset="1" stop-color="#ff7f47"/>
+    </linearGradient>
+    <clipPath id="ticket">
+      <path d="M20 8 h360 a12 12 0 0 1 12 12 v40 c0 6 5 12 12 12 h6 v68 h-6 c-7 0-12 6-12 12 v40 a12 12 0 0 1-12 12 h-360 a12 12 0 0 1-12-12 v-40 c0-6-5-12-12-12 h-6 v-68 h6 c7 0 12-6 12-12 v-40 a12 12 0 0 1 12-12 z"/>
+    </clipPath>
+  </defs>
+  <g clip-path="url(#ticket)">
+    <rect x="0" y="0" width="420" height="260" fill="#fff"/>
+    <!-- subtle background texture -->
+    <rect x="360" y="0" width="60" height="260" fill="url(#o)" opacity="0.15"/>
+  </g>
+  <!-- border path mimicking cut corners -->
+  <path d="M20 8 h360 a12 12 0 0 1 12 12 v40 c0 8 6 14 14 14 h6 v64 h-6 c-8 0-14 6-14 14 v40 a12 12 0 0 1-12 12 h-360 a12 12 0 0 1-12-12 v-40 c0-8-6-14-14-14 h-6 v-64 h6 c8 0 14-6 14-14 v-40 a12 12 0 0 1 12-12 z" fill="none" stroke="#ef5a22" stroke-width="2"/>
+  <!-- small orange notch at bottom-right -->
+  <path d="M388 210 l20 0 l0 20 l-20 0 z" fill="url(#o)"/>
+</svg>

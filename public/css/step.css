@@ -1,6 +1,6 @@
 /* ---------- COMMON STYLES ---------- */
 .form-frame {
-  background: #ffffff;
+  background: #ffffffe6;
   border-radius: 6px;
   box-shadow: 0 8px 20px rgba(0,0,0,0.5);
   padding: 35px 10px;
@@ -8,7 +8,7 @@
   margin: 8px auto;
 }
 .form-frame1{
-  background: #ffffff;
+  background: #ffffffe6;
   border-radius: 6px;
   box-shadow: 0 8px 20px rgba(0,0,0,0.5);
   padding: 35px 10px;
@@ -129,6 +129,50 @@
   display: block;
 }
 
+/* Age note under DOB */
+.age-note {
+  display: none;
+  background: #eaf5ff;
+  color: #ef5a22;
+  text-align: center;
+  padding: 8px 10px;
+  margin-top: 6px;
+  font-weight: 700;
+  border-radius: 4px;
+  font-family: "Replica-Mono", monospace;
+  transition: opacity 0.15s ease, transform 0.15s ease;
+  opacity: 0;
+  transform: translateY(-4px);
+  z-index: 9999;
+}
+
+
+input.flatpickr-input:focus + .age-note,
+input[type="date"]:focus + .age-note,
+input:focus + .age-note,
+input[aria-expanded="true"] + .age-note {
+  display: block;
+  opacity: 1;
+  transform: translateY(0);
+}
+
+
+.age-note.error {
+  background: #fdecea;
+  color: #d9534f;
+}
+
+/* Flatpickr footer note inside calendar */
+.flatpickr-calendar .age-footnote {
+  background: #eaf5ff;
+  color: #ef5a22;
+  text-align: center;
+  padding: 8px 10px;
+  font-weight: 700;
+  border-top: 1px solid #ddd;
+  font-family: "Replica-Mono", monospace;
+}
+
 .form-content-2 input,
 .form-content-2 select {
   width: 100%;
@@ -178,7 +222,7 @@ font-size: 15px;
     color: #666;
     margin-top: 10px;
     font-weight: 500;
-    bottom: -141%;
+    bottom: -155%;
     right: 34%;
 }
 
@@ -207,10 +251,25 @@ font-size: 15px;
   margin-top: 20px;
 }
 
+/* NEXT button becomes orange when enabled */
+.btn-next-2c:not(:disabled) {
+  background: #ef5a22;
+}
+
 .btn-text-2 {
   display: inline-block;
   transform: skewX(-31deg);
   font-size: 20px;
+}
+
+/* Disabled states for custom buttons */
+.btn-next-2a:disabled,
+.btn-next-2b:disabled,
+.btn-next-2c:disabled {
+  background: #C9C9C9 !important;
+  color: #fff !important;
+  cursor: not-allowed !important;
+  opacity: 1;
 }
 
 /* Common Button Styles */

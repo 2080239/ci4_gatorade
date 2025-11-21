@@ -1,7 +1,10 @@
+<?= $this->include('layouts/header') ?>
 <?php // /C:/wamp64/www/ci4_gatorade/app/Views/registration/step3.php ?>
 <div class="tab-pane show active" id="step3" role="tabpanel" aria-labelledby="step3-tab">
-  <form method="post">
+  <form method="post" id="rosterForm">
     <?= csrf_field() ?>
+    <input type="hidden" name="coach_id" value="<?= esc($coach['id'] ?? ($coachId ?? '')) ?>">
+    <input type="hidden" id="roster_json" name="roster_json" value="">
 
     <div class="step3-row">
       <!-- LEFT IMAGE -->
@@ -126,4 +129,42 @@
       </div>
     </div>
   </form>
-</div>
+ </div>
+<?= $this->include('layouts/footer') ?>
+<script>
+(function(){
+  const form = document.getElementById('rosterForm');
+  const rosterField = document.getElementById('roster_json');
+  form.addEventListener('submit', function(){
+    const first = document.querySelectorAll('input[name="athlete_first_name[]"]');
+    const middle = document.querySelectorAll('input[name="athlete_middle_name[]"]');
+    const last = document.querySelectorAll('input[name="athlete_last_name[]"]');
+    const dob = document.querySelectorAll('input[name="athlete_dob[]"]');
+    const phone = document.querySelectorAll('input[name="athlete_phone[]"]');
+    const email = document.querySelectorAll('input[name="athlete_email[]"]');
+    const pfirst = document.querySelectorAll('input[name="parent_name[]"]');
+    const pemail = document.querySelectorAll('input[name="parent_email[]"]');
+    const pphone = document.querySelectorAll('input[name="parent_phone[]"]');
+    const roster = [];
+    for (let i=0;i<first.length;i++) {
+      const af = first[i].value.trim();
+      const al = last[i].value.trim();
+      const ae = email[i].value.trim();
+      if (!af && !al && !ae) continue; // skip empty row
+      roster.push({
+        athlete_first: af || null,
+        athlete_middle: middle[i].value.trim() || null,
+        athlete_last: al || null,
+        athlete_email: ae || null,
+        athlete_dob: dob[i].value || null,
+        athlete_phone: phone[i].value.trim() || null,
+        parent_first: pfirst[i].value.trim() || null,
+        parent_email: pemail[i].value.trim() || null,
+        parent_phone: pphone[i].value.trim() || null,
+        is_reserve: i >= 6 ? 1 : 0
+      });
+    }
+    rosterField.value = JSON.stringify(roster);
+  });
+})();
+</script>

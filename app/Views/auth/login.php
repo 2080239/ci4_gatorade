@@ -12,6 +12,7 @@
     <?php endif; ?>
 
     <?= form_open('/login'); ?>
+    <?= csrf_field() ?>
         <div class="mb-3">
             <label for="email" class="form-label">Email</label>
             <input type="email" name="email" id="email" class="form-control" required value="<?= esc(old('email')) ?>">

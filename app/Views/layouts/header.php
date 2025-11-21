@@ -20,6 +20,22 @@
 </head>
 <body>
 
+<?php
+  // Fallback: auto-detect current step from URL if not provided
+  if (!isset($currentStep)) {
+    try {
+      $uri = function_exists('service') ? service('uri') : null;
+      $path = $uri ? strtolower($uri->getPath()) : '';
+      $flat = preg_replace('/[^a-z0-9]/i', '', (string)$path);
+      if (preg_match('/step([1-4])/', $flat, $m)) {
+        $currentStep = (int)$m[1];
+      }
+    } catch (Throwable $e) {
+      // ignore; header will just render without active step
+    }
+  }
+?>
+
   <!-- HEADER -->
 <header class="gatorade-header d-flex align-items-center justify-content-between px-4" style="background-image: url('<?= base_url('asset/Rectangle 1.png') ?>');">
   <!-- Left Logo -->
@@ -41,31 +57,21 @@
   <div class="container my-4" >
     <div class="form-frame">
 
-      <!-- Steps (non-clickable, changes only when page changes) -->
-      <div class="steps-wrapper">
-        <ul class="nav nav-tabs" id="registrationSteps" role="tablist">
-          <li class="nav-item" role="presentation">
-        <span class="step nav-link <?= (isset($currentStep) && $currentStep === 1) ? 'active' : '' ?>" aria-current="<?= (isset($currentStep) && $currentStep === 1) ? 'page' : 'false' ?>">
-          <span class="step-inner">STEP 1</span>
-        </span>
-          </li>
-          <li class="nav-item" role="presentation">
-        <span class="step nav-link <?= (isset($currentStep) && $currentStep === 2) ? 'active' : '' ?>" aria-current="<?= (isset($currentStep) && $currentStep === 2) ? 'page' : 'false' ?>">
-          <span class="step-inner">STEP 2</span>
-        </span>
-          </li>
-          <li class="nav-item" role="presentation">
-        <span class="step nav-link <?= (isset($currentStep) && $currentStep === 3) ? 'active' : '' ?>" aria-current="<?= (isset($currentStep) && $currentStep === 3) ? 'page' : 'false' ?>">
-          <span class="step-inner">STEP 3</span>
-        </span>
-          </li>
-          <li class="nav-item" role="presentation">
-        <span class="step nav-link <?= (isset($currentStep) && $currentStep === 4) ? 'active' : '' ?>" aria-current="<?= (isset($currentStep) && $currentStep === 4) ? 'page' : 'false' ?>">
-          <span class="step-inner">STEP 4</span>
-        </span>
-          </li>
-        </ul>
+      
+        <div class="steps-wrapper">
+      <div class="step <?= (isset($currentStep) && $currentStep == 1) ? 'active' : '' ?>" aria-current="<?= (isset($currentStep) && $currentStep == 1) ? 'page' : 'false' ?>">
+        <div class="step-inner">STEP 1</div>
       </div>
+      <div class="step <?= (isset($currentStep) && $currentStep == 2) ? 'active' : '' ?>" aria-current="<?= (isset($currentStep) && $currentStep == 2) ? 'page' : 'false' ?>">
+        <div class="step-inner">STEP 2</div>
+      </div>
+      <div class="step <?= (isset($currentStep) && $currentStep == 3) ? 'active' : '' ?>" aria-current="<?= (isset($currentStep) && $currentStep == 3) ? 'page' : 'false' ?>">
+        <div class="step-inner">STEP 3</div>
+      </div>
+      <div class="step <?= (isset($currentStep) && $currentStep == 4) ? 'active' : '' ?>" aria-current="<?= (isset($currentStep) && $currentStep == 4) ? 'page' : 'false' ?>">
+        <div class="step-inner">STEP 4</div>
+      </div>
+        </div>
 
       <!-- Tab Content -->
       <div class="tab-content" id="registrationStepsContent">

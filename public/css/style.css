@@ -1,0 +1,197 @@
+body {
+  background-color: #ffffffac;
+  font-family: 'Poppins', sans-serif;
+}
+
+/* Sidebar */
+.sidebar {
+  background-color: #ffffff;
+  min-height: 100vh;
+  padding: 20px 0;
+}
+
+.sidebar-inner {
+  padding: 20px 0;
+}
+
+.sidebar .nav {
+  margin-top: 160px;
+}
+
+.sidebar .nav-link {
+  color: #0b0b0b;
+  padding: 15px 30px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  font-size: 14px;
+  border-left: 4px solid transparent;
+}
+
+.sidebar .nav-link.active,
+.sidebar .nav-link:hover {
+  background-color: rgba(243, 111, 33, 0.1);
+  color: #f36f21;
+  border-left: 4px solid #f36f21;
+}
+
+/* Dashboard Content */
+.coach-dashboard-title{
+font-family:  monospace;
+font-weight: 700;
+font-size: 30px;
+line-height: 100%;
+    margin-top: 50px;
+
+
+}
+.team-name{
+ font-family:  monospace;
+font-weight: 700;
+font-size: 24px;
+line-height: 100%;
+margin-bottom: 50px;
+}
+.dashboard-content {
+  background-color: #fff;
+  padding: 20px 40px;
+}
+
+/* Stat Boxes */
+/* .stat-box {
+  background: #fff;
+  border: 2px solid #f36f21;
+  border-radius: 12px;
+  padding: 10px;
+  transition: 0.3s;
+} */
+
+.stat-box:hover {
+  transform: translateY(-5px);
+}
+
+.stat-box img {
+  height: 150px;
+}
+
+.stat-number {
+  color: #f36f21;
+  font-weight: bold;
+  font-size: 1.1rem;
+}
+
+/* Ticket style stat card with decorative SVG background */
+.stat-box.ticket {
+  background: url('../asset/stat-card-bg.png') center/cover no-repeat #fff;
+  border: 0;
+  height: 150px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: flex-start;
+  padding: 14px 16px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+.stat-box.ticket .stat-title { color: #111; font-weight: 700; margin-bottom: 4px; }
+.stat-box.ticket .stat-value { color: #f36f21; font-weight: 800; font-size: 22px; }
+
+/* Tabs */
+.custom-tabs .nav-link {
+    color: #0b0b0b;
+    font-weight: 700;
+    padding: 14px 66px;
+    background: #e1dbd92e;
+    clip-path: polygon(3% 0%, 87% 0, 100% 100%, 18% 100%);
+    transition: 0.3s;
+   
+}
+
+.custom-tabs .nav-link.active {
+  color: #fff;
+  background-color: #f36f21;
+  border-radius: 5px;
+      padding: 13px 45px;
+    border: none;
+    font-weight: 600;
+    clip-path: polygon(0% 0%, 85% 0, 100% 100%, 18% 100%);
+}
+
+/* Form */
+.form-label {
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.form-control {
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  padding: 12px 15px;
+  background-color: #f8f9fa;
+}
+
+.form-control::placeholder {
+  color: #6c757d;
+  opacity: 0.8;
+}
+
+#address .form-control {
+  background-color: #fff;
+  border: 1px solid #dee2e6;
+}
+
+#address .form-label {
+  color: #212529;
+  font-size: 14px;
+  margin-bottom: 8px;
+}
+
+.btn-save {
+  background-color: #f36f21;
+  color: #fff;
+  font-weight: 600;
+  padding: 11px 53px;
+     border-radius: 1px;
+    transform: skewX(32deg);
+    box-shadow: 0 6px 14px rgba(0, 0, 0, 0.18);
+}
+
+.btn-save:hover {
+  background-color: #d85e1e;
+}
+
+
+/* Profile */
+.profile-pic {
+  position: relative;
+  width: 130px;
+  height: 130px;
+  margin: 0 auto;
+  border: 3px solid #f36f21;
+  border-radius: 50%;
+  padding: 4px;
+}
+
+.profile-pic .rounded-circle {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+.profile-pic .image2 {
+position: absolute;
+    width: 102px;
+    height: 101px;
+    bottom: 13px;
+    right: 13px;
+    border-radius: 50%;
+    padding: 5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+.btn-text {
+    font-family: 'Poppins', sans-serif;
+       display: inline-block;
+    transform: skewX(-31deg);
+}
+
+
+

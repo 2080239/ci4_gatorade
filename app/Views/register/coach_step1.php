@@ -1,5 +1,4 @@
-<?php /* Styles are already included by layouts/header.php; avoid duplicate link tags here. */ ?>
-
+<?= $this->include('layouts/header') ?>
 <div class="tab-pane show active" id="step1" role="tabpanel" aria-labelledby="step1-tab">
   <div class="row">
     <div class="col-md-7 form-left d-flex align-items-start">
@@ -32,7 +31,7 @@
             <button type="submit" class="btn btn-primary btn-next">
               <span class="btn-text">NEXT</span>
             </button>
-            <a href="#" class="ms-3 rules-link align-self-center">Gatorade 5v5 Tournament – General Rules</a>
+            <a href="#" class="ms-3 rules-link align-self-center" style="position: absolute; top: 109%; left: 44%;">Gatorade 5v5 Tournament – General Rules</a>
           </div>
         </form>
       </div>
@@ -44,5 +43,6 @@
       </div>
     </div>
   </div>
-</div>
+ </div>
+<?= $this->include('layouts/footer') ?>
 
