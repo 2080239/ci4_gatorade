@@ -1,0 +1,31 @@
+/* Athletes tab specific styles */
+.athletes-table {width:100%;border-collapse:collapse;font-size:.9rem;}
+.athletes-table thead tr {background:#FA5000;color:#fff;position:relative;}
+.athletes-table thead tr::before,.athletes-table thead tr::after {content:"";position:absolute;top:0;width:55px;height:100%;background:#FA5000;}
+.athletes-table thead tr::before {left:-40px;clip-path:polygon(0 0,100% 0,85% 100%,0 100%);}
+.athletes-table thead tr::after {right:-40px;clip-path:polygon(15% 0,100% 0,100% 100%,0 100%);}
+.athletes-table-header-cell {background:transparent;border:none;font-weight:700;letter-spacing:.5px;padding:.75rem .85rem;}
+.athletes-table td {padding:.65rem .85rem;border-bottom:1px solid #eee;}
+.athletes-table tbody tr:hover {background:rgba(255, 255, 255, 0.05);}
+.invite-code {font-weight:600;color:#d64400;}
+@media (max-width:768px){
+  .athletes-table {min-width:720px;}
+  .athletes-table-wrapper {overflow-x:auto;}
+}
+
+/* Brand header (top-left) */
+.athletes-brand {display:flex;align-items:center;margin:.25rem 0 1rem 0;}
+.athletes-brand .brand-text {line-height:1.1;}
+.athletes-brand .brand-title {font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:#333;font-size:1rem;}
+.athletes-brand .brand-subtitle {color:#666;font-weight:700;font-size:.9rem;letter-spacing:.05em;}
+.athletes-brand .brand-subtitle .team-name {text-transform:uppercase;color:#333;}
+
+/* Status badges matching screenshot tones */
+.status-badge {display:inline-block;min-width:84px;text-align:center;padding:4px 10px;border-radius:999px;font-size:.78rem;font-weight:700;}
+.status-badge.confirmed {color:#0aa2ff;background:rgba(10,162,255,.1);} /* blue */
+.status-badge.pending {color:#FA5000;background:rgba(250,80,0,.12);}   /* orange */
+
+/* Links and wrapper */
+.athletes-table a {color:#111;text-decoration:none;}
+.athletes-table a:hover {text-decoration:underline;}
+.athletes-table-wrapper {overflow:visible;}

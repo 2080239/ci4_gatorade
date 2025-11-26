@@ -1,0 +1,8 @@
+/* Dashboard tab specific styles */
+.inner-tabs {border-bottom:1px solid #eee;}
+.inner-tabs .nav-link {font-weight:600;color:#495057;transition:.25s;}
+.inner-tabs .nav-link:hover {color:#FA5000;}
+.inner-tabs .nav-link.active {background:#FA5000;color:#fff;border-color:#FA5000;}
+.inner-tabs .nav-link span {font-size:0.85rem;}
+.profile-pic img {width:120px;height:120px;object-fit:cover;}
+.team-name {font-weight:600;color:#555;margin:0;}

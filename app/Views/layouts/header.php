@@ -17,6 +17,7 @@
   <!-- Your local CSS files (use base_url so CI can resolve paths) -->
   <link href="<?= base_url('css/headerfooter.css') ?>" rel="stylesheet">
   <link href="<?= base_url('css/step.css') ?>" rel="stylesheet">
+  <link href="<?= base_url('css/coach-dashboard.css') ?>" rel="stylesheet">
 </head>
 <body>
 

@@ -1,4 +1,5 @@
 <?= $this->include('layouts/header') ?>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 <div class="tab-pane show active" id="athlete-step2" role="tabpanel">
   <div class="form-frame-2">
     <?php if(!empty($error)): ?>
@@ -38,8 +39,8 @@ Ensure all details are accurate and update any incorrect information.</h6>
 
           <div class="row-2">
             <div class="col-2">
-              <label>Date of Birth*</label>
-              <input type="date" name="dob" value="<?= esc($athlete['dob']) ?>" required>
+              <label>Date of Birth* <small id="ageRange" style="display:block;font-weight:normal;color:#ff5722;"></small></label>
+              <input id="athleteDob" type="text" name="dob" value="<?= esc($athlete['dob']) ?>" required>
             </div>
             <div class="col-2">
               <label>Phone Number</label>
@@ -49,8 +50,8 @@ Ensure all details are accurate and update any incorrect information.</h6>
 
           <div class="row-2">
             <div class="col-2">
-              <label>Address Line 1</label>
-              <input type="text" name="address_line1" value="<?= esc($athlete['address_line1']) ?>">
+              <label>Address Line 1*</label>
+              <input type="text" name="address_line1" value="<?= esc($athlete['address_line1']) ?>" required>
             </div>
             <div class="col-2">
               <label>Address Line 2</label>
@@ -60,24 +61,27 @@ Ensure all details are accurate and update any incorrect information.</h6>
 
           <div class="row-2">
             <div class="col-2">
-              <label>City</label>
-              <input type="text" name="city" value="<?= esc($athlete['city']) ?>">
+              <label>City*</label>
+              <input type="text" name="city" value="<?= esc($athlete['city']) ?>" required>
             </div>
             <div class="col-2">
-              <label>State</label>
-              <select name="state">
+              <label>State*</label>
+              <select name="state" required>
                 <?php $st = $athlete['state'] ?? ''; ?>
                 <option value="">Select state</option>
-                <option<?= $st==='Alabama' ? ' selected' : '' ?>>Alabama</option>
-                <option<?= $st==='Alaska' ? ' selected' : '' ?>>Alaska</option>
-                <option<?= $st==='Arizona' ? ' selected' : '' ?>>Arizona</option>
-                <option<?= $st==='Arkansas' ? ' selected' : '' ?>>Arkansas</option>
-                <option<?= $st==='California' ? ' selected' : '' ?>>California</option>
+                <?php
+                  $states = [
+                    'Alabama','Alaska','Arizona','Arkansas','California','Colorado','Connecticut','Delaware','Florida','Georgia','Hawaii','Idaho','Illinois','Indiana','Iowa','Kansas','Kentucky','Louisiana','Maine','Maryland','Massachusetts','Michigan','Minnesota','Mississippi','Missouri','Montana','Nebraska','Nevada','New Hampshire','New Jersey','New Mexico','New York','North Carolina','North Dakota','Ohio','Oklahoma','Oregon','Pennsylvania','Rhode Island','South Carolina','South Dakota','Tennessee','Texas','Utah','Vermont','Virginia','Washington','West Virginia','Wisconsin','Wyoming'
+                  ];
+                  foreach($states as $state):
+                ?>
+                  <option value="<?= esc($state) ?>"<?= $st===$state ? ' selected' : '' ?>><?= esc($state) ?></option>
+                <?php endforeach; ?>
               </select>
             </div>
             <div class="col-2">
-              <label>ZIP / Postal Code</label>
-              <input type="text" name="zip_code" value="<?= esc($athlete['zip_code']) ?>">
+              <label>ZIP / Postal Code*</label>
+              <input type="text" name="zip_code" value="<?= esc($athlete['zip_code']) ?>" required>
             </div>
           </div>
 
@@ -107,3 +111,32 @@ Ensure all details are accurate and update any incorrect information.</h6>
   </div>
  </div>
 <?= $this->include('layouts/footer') ?>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script>
+ (function(){
+   const dobInput = document.getElementById('athleteDob');
+   if(!dobInput) return;
+   // Age rule: 14+ on Nov 1 2025 AND under 17 on May 30 2026
+   const minDate = new Date('2009-05-31'); // > May 30 2009
+   const maxDate = new Date('2011-11-01'); // <= Nov 1 2011
+   const rangeText = 'Allowed DOB: May 31, 2009 to Nov 1, 2011';
+   document.getElementById('ageRange').textContent = rangeText;
+   flatpickr(dobInput, {
+     dateFormat: 'Y-m-d',
+     allowInput: true,
+     maxDate: maxDate,
+     minDate: minDate,
+     disableMobile: true,
+     onReady: function(selectedDates, dateStr, instance){
+       const fpCal = instance.calendarContainer;
+       if(!fpCal.querySelector('.age-footnote')){
+         const note = document.createElement('div');
+         note.className = 'age-footnote';
+         note.style.cssText = 'padding:8px 10px;background:#fff3e0;border-top:1px solid #ffc085;font-size:12px;color:#d35400;';
+         note.innerHTML = '<strong>Age Requirements:</strong><br>14+ on Nov 1, 2025<br>Under 17 on May 30, 2026';
+         fpCal.appendChild(note);
+       }
+     }
+   });
+ })();
+</script>

@@ -1,0 +1,15 @@
+/* Waivers tab specific styles */
+.waivers-stats-container {display:flex;flex-direction:column;gap:1.5rem;}
+.stats-grid {display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1rem;}
+.stat-card {background:#fff;border-left:4px solid #FA5000;padding:1rem .9rem;border-radius:4px;box-shadow:0 2px 4px rgba(0,0,0,.06);} 
+.stat-card h3 {font-size:0.95rem;font-weight:600;margin:0 0 .35rem;}
+.stat-card p {margin:0;font-weight:600;}
+.orange-txt {color:#FA5000;font-weight:700;}
+.not-approved-explanations {display:grid;gap:1rem;}
+.not-approved-section {border-left:4px solid #FA5000;background:#fff;box-shadow:0 2px 4px rgba(0,0,0,.06);border-radius:4px;}
+.not-approved-header {display:flex;align-items:center;gap:.5rem;padding:.6rem .75rem;border-bottom:1px solid #f4f4f4;font-weight:700;}
+.not-approved-header .warning-icon {display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;background:#FA5000;color:#fff;font-weight:700;}
+.not-approved-content {padding:.75rem .85rem;font-size:.85rem;}
+@media (max-width:768px){
+  .stats-grid {grid-template-columns:repeat(auto-fit,minmax(160px,1fr));}
+}

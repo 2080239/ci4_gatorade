@@ -8,6 +8,7 @@ body {
   background-color: #ffffff;
   min-height: 100vh;
   padding: 20px 0;
+  border-right: 1px solid #e25b1c;
 }
 
 .sidebar-inner {
@@ -17,6 +18,7 @@ body {
 .sidebar .nav {
   margin-top: 160px;
 }
+
 
 .sidebar .nav-link {
   color: #0b0b0b;
@@ -79,9 +81,9 @@ margin-bottom: 50px;
   font-size: 1.1rem;
 }
 
-/* Ticket style stat card with decorative SVG background */
+
 .stat-box.ticket {
-  background: url('../asset/stat-card-bg.png') center/cover no-repeat #fff;
+  background: url('../asset/stat-card-bg.png') center/cover no-ru6epeat ;
   border: 0;
   height: 150px;
   display: flex;

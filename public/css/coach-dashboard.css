@@ -1,0 +1,31 @@
+/* Coach Dashboard extracted styles */
+/* ===== Sidebar main tabs styling ===== */
+.sidebar-tabs .nav-link {color:#8E8E93;font-weight:600;border-radius:0;text-align:left;position:relative;transition:.25s;background:transparent;}
+.sidebar-tabs .nav-link .icon svg {display:block;}
+.sidebar-tabs .nav-link:hover {background:linear-gradient(90deg,#ffffff,#ffe9df);color:#FA5000;}
+.sidebar-tabs .nav-link:hover .icon svg path {fill:#FA5000;}
+.sidebar-tabs .nav-link.active {background:#FA5000;color:#fff;font-weight:700;box-shadow:inset 4px 0 0 #d64400,inset -4px 0 0 #d64400;}
+.sidebar-tabs .nav-link.active .icon svg path {fill:#fff;}
+
+/* Small left accent bar */
+.sidebar-tabs .nav-link::before {content:"";position:absolute;left:0;top:0;height:100%;width:4px;background:transparent;transition:.25s;}
+.sidebar-tabs .nav-link.active::before {background:#fff;}
+
+
+/* ===== Status badges refine ===== */
+.status-badge {letter-spacing:.5px;box-shadow:0 2px 4px rgba(0,0,0,.15);} 
+.status-badge.confirmed {background:#22AC47;}
+.status-badge.pending {background:#FA5000;}
+
+
+
+
+@media (max-width: 992px){
+  .sidebar-tabs .nav-link {padding:.6rem .85rem;font-size:.85rem;}
+}
+@media (max-width: 768px){
+  .sidebar-tabs .nav-link {padding:.5rem .75rem;font-size:.8rem;}
+  .inner-tabs .nav-link {font-size:.8rem;}
+  .athletes-table {min-width:720px;}
+  .athletes-table-wrapper {overflow-x:auto;}
+}

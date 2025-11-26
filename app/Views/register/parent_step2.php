@@ -1,4 +1,5 @@
 <?= $this->include('layouts/header') ?>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 <div class="tab-pane show active" id="parent-step2" role="tabpanel">
   <div class="form-frame-2">
     <?php if(!empty($error)): ?><div class="alert alert-danger"><?= esc($error) ?></div><?php endif; ?>
@@ -43,7 +44,7 @@ Please review and complete your Parent / Legal Guardian information below. Ensur
           <div class="row-2">
             <div class="col-2">
               <label>Date of Birth*</label>
-              <input type="date" name="dob" value="<?= esc($parent['dob']) ?>" required>
+              <input type="text" id="parentDob" name="dob" value="<?= esc($parent['dob']) ?>" required>
             </div>
             <div class="col-2">
               <label>Phone Number</label>
@@ -113,4 +114,17 @@ Please review and complete your Parent / Legal Guardian information below. Ensur
     </div>
   </div>
  </div>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script>
+  (function(){
+    var el = document.getElementById('parentDob');
+    if (el && typeof flatpickr !== 'undefined') {
+      flatpickr(el, {
+        dateFormat: 'Y-m-d',
+        allowInput: true,
+        disableMobile: true
+      });
+    }
+  })();
+  </script>
 <?= $this->include('layouts/footer') ?>

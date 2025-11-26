@@ -28,10 +28,10 @@ class RegisterController extends Controller
 
     public function coachStep1Submit()
     {
-        // New simplified flow: create a draft record and branch by selected role.
+        
         $role = strtolower(trim($this->request->getPost('role') ?? 'coach'));
-        // Use dynamic roleId() helper; fallback to coach if missing
-        $lookupSlug = $role === 'player' ? 'athlete' : $role; // map player -> athlete
+      
+        $lookupSlug = $role === 'player' ? 'athlete' : $role; 
         $roleId = roleId($lookupSlug) ?? roleId('coach') ?? 1;
 
         // Create draft record; details collected in subsequent steps.
@@ -120,13 +120,16 @@ class RegisterController extends Controller
             $update['activation_code'] = strtoupper(trim($post['activation_code']));
         }
 
-        // Advance status after profile entry (activation optional here)
+        // Mark profile entered
         $update['status'] = 'profile_entered';
-
         $this->userModel->update($post['coach_id'], $update);
 
-        // After coach submits details, take them to the Coach Dashboard
-        return redirect()->to('/coach/dashboard?coach_id='.$post['coach_id']);
+        // Always proceed to roster building after profile unless already fully completed
+        $coach = $this->userModel->find($post['coach_id']);
+        if (!empty($coach['status']) && $coach['status'] === 'completed') {
+            return redirect()->to('/register/coach/dashboard?coach_id='.$post['coach_id']);
+        }
+        return redirect()->to('/register/coach/step3?coach_id='.$post['coach_id']);
     }
 
     // Coach Step3: create roster (athlete + parent rows) and send invites
@@ -134,7 +137,31 @@ class RegisterController extends Controller
     {
         $coachId = $this->request->getGet('coach_id');
         $coach = $this->userModel->find($coachId);
-        return view('register/coach_step3', ['coach'=>$coach]);
+        $rosterExisting = [];
+        if ($coachId) {
+            $athleteRoleId = roleId('athlete') ?? 3;
+            $parentRoleId  = roleId('parent') ?? 2;
+            $athletes = $this->userModel->where('role_id',$athleteRoleId)->where('coach_id',$coachId)->orderBy('is_reserve','ASC')->findAll();
+            $index = 0;
+            foreach ($athletes as $ath) {
+                if ($index >= 8) break; // limit to form slots
+                $parent = $this->userModel->where('role_id',$parentRoleId)->where('coach_id',$coachId)->where('linked_athlete_id',$ath['id'])->first();
+                $rosterExisting[$index] = [
+                    'athlete_first' => $ath['first_name'] ?? '',
+                    'athlete_middle'=> $ath['middle_name'] ?? '',
+                    'athlete_last'  => $ath['last_name'] ?? '',
+                    'athlete_dob'   => $ath['dob'] ?? '',
+                    'athlete_phone' => $ath['phone'] ?? '',
+                    'athlete_email' => $ath['email'] ?? '',
+                    'parent_first'  => $parent['first_name'] ?? '',
+                    'parent_email'  => $parent['email'] ?? '',
+                    'parent_phone'  => $parent['phone'] ?? '',
+                    'is_reserve'    => $ath['is_reserve'] ?? 0,
+                ];
+                $index++;
+            }
+        }
+        return view('register/coach_step3', ['coach'=>$coach,'coachId'=>$coachId,'rosterExisting'=>$rosterExisting]);
     }
 
     public function coachStep3Submit()
@@ -166,8 +193,11 @@ class RegisterController extends Controller
             $athleteFirst = $post['athlete_first_name'] ?? [];
             $athleteLast  = $post['athlete_last_name'] ?? [];
             $athleteEmail = $post['athlete_email'] ?? [];
+            $athleteDob   = $post['athlete_dob'] ?? [];
+            $athletePhone = $post['athlete_phone'] ?? [];
             $parentFirst  = $post['parent_name'] ?? [];
             $parentEmail  = $post['parent_email'] ?? [];
+            $parentPhone  = $post['parent_phone'] ?? [];
             $count = max(count($athleteFirst), count($athleteLast), count($athleteEmail));
             for ($i=0;$i<$count;$i++) {
                 $af = trim($athleteFirst[$i] ?? '');
@@ -178,8 +208,11 @@ class RegisterController extends Controller
                     'athlete_first' => $af ?: null,
                     'athlete_last'  => $al ?: null,
                     'athlete_email' => $ae ?: null,
+                    'athlete_dob'   => trim($athleteDob[$i] ?? '') ?: null,
+                    'athlete_phone' => trim($athletePhone[$i] ?? '') ?: null,
                     'parent_first'  => trim($parentFirst[$i] ?? '') ?: null,
                     'parent_email'  => trim($parentEmail[$i] ?? '') ?: null,
+                    'parent_phone'  => trim($parentPhone[$i] ?? '') ?: null,
                     'is_reserve'    => $i >= 6 ? 1 : 0
                 ];
             }
@@ -188,34 +221,84 @@ class RegisterController extends Controller
             return redirect()->back()->with('error','Invalid roster');
         }
 
+        $minTs = strtotime('2009-05-31');
+        $maxTs = strtotime('2011-11-01');
         foreach ($roster as $entry) {
-            // insert athlete row
+            // Prepare athlete fields
             $athleteCode = $this->generateCode();
-            $athleteId = $this->userModel->insert([
-                'role_id'=>3,
-                'first_name'=>$entry['athlete_first'] ?? null,
-                'last_name'=>$entry['athlete_last'] ?? null,
-                'email'=>$entry['athlete_email'] ?? null,
-                'invitation_code'=>$athleteCode,
-                'coach_id'=>$coachId,
-                'is_reserve'=>!empty($entry['is_reserve'])?1:0,
-                'status'=>'invited',
-                'expiry_date'=>date('Y-m-d H:i:s', strtotime('+14 days'))
-            ]);
+            $athleteRoleId = roleId('athlete') ?? 3;
+            $athleteEmail = $entry['athlete_email'] ?? null;
+            $existsAth = null;
+            if (!empty($athleteEmail)) {
+                $existsAth = $this->userModel->where('role_id',$athleteRoleId)->where('coach_id',$coachId)->where('email',$athleteEmail)->first();
+            }
+            if ($existsAth) {
+                // Update missing dob/phone if not set previously
+                $updateAth = [];
+                if (!empty($entry['athlete_dob']) && empty($existsAth['dob'])) {
+                    $updateAth['dob'] = $entry['athlete_dob'];
+                }
+                if (!empty($entry['athlete_phone']) && empty($existsAth['phone'])) {
+                    $updateAth['phone'] = $entry['athlete_phone'];
+                }
+                if ($updateAth) {
+                    $this->userModel->update($existsAth['id'], $updateAth);
+                }
+                $athleteId = $existsAth['id'];
+            } else {
+                // Validate DOB range if provided
+                $dobVal = $entry['athlete_dob'] ?? null;
+                if ($dobVal) {
+                    $ts = strtotime($dobVal);
+                    if (!$ts || $ts < $minTs || $ts > $maxTs) {
+                        $dobVal = null; // discard invalid DOB
+                    }
+                }
+                $athleteId = $this->userModel->insert([
+                    'role_id'=>3,
+                    'first_name'=>$entry['athlete_first'] ?? null,
+                    'last_name'=>$entry['athlete_last'] ?? null,
+                    'email'=>$athleteEmail,
+                    'invitation_code'=>$athleteCode,
+                    'coach_id'=>$coachId,
+                    'is_reserve'=>!empty($entry['is_reserve'])?1:0,
+                    'status'=>'invited',
+                    'dob'=>$dobVal,
+                    'phone'=>$entry['athlete_phone'] ?? null,
+                    'expiry_date'=>date('Y-m-d H:i:s', strtotime('+14 days'))
+                ]);
+            }
 
-            // insert parent row
+            // Parent row
             $parentCode = $this->generateCode();
-            $this->userModel->insert([
-                'role_id'=>2,
-                'first_name'=>$entry['parent_first'] ?? null,
-                'last_name'=>$entry['parent_last'] ?? null,
-                'email'=>$entry['parent_email'] ?? null,
-                'invitation_code'=>$parentCode,
-                'coach_id'=>$coachId,
-                'linked_athlete_id'=>$athleteId,
-                'status'=>'invited',
-                'expiry_date'=>date('Y-m-d H:i:s', strtotime('+14 days'))
-            ]);
+            $parentEmail = $entry['parent_email'] ?? null;
+            $parentRoleId = roleId('parent') ?? 2;
+            $existsParent = null;
+            if (!empty($parentEmail) && $athleteId) {
+                $existsParent = $this->userModel->where('role_id',$parentRoleId)->where('coach_id',$coachId)->where('linked_athlete_id',$athleteId)->where('email',$parentEmail)->first();
+            }
+            if ($existsParent) {
+                $updateParent = [];
+                if (!empty($entry['parent_phone']) && empty($existsParent['phone'])) {
+                    $updateParent['phone'] = $entry['parent_phone'];
+                }
+                if ($updateParent) {
+                    $this->userModel->update($existsParent['id'], $updateParent);
+                }
+            } else {
+                $this->userModel->insert([
+                    'role_id'=>2,
+                    'first_name'=>$entry['parent_first'] ?? null,
+                    'last_name'=>$entry['parent_last'] ?? null, // may be null (not collected yet)
+                    'email'=>$parentEmail,
+                    'invitation_code'=>$parentCode,
+                    'coach_id'=>$coachId,
+                    'linked_athlete_id'=>$athleteId,
+                    'status'=>'invited',
+                    'phone'=>$entry['parent_phone'] ?? null,
+                    'expiry_date'=>date('Y-m-d H:i:s', strtotime('+14 days'))
+                ]);
+            }
 
             // send emails (try catch)
             $email = Services::email();
@@ -239,9 +322,38 @@ class RegisterController extends Controller
             } catch (\Exception $e) { /* ignore during dev */ }
         }
 
-        // Mark coach status progressed
-        $this->userModel->update($coachId, ['status'=>'roster_entered']);
-        return redirect()->to('/register/coach/step4?coach_id='.$coachId);
+        // Determine if main roster (non-reserve) meets completion threshold (>=6 complete entries)
+        $mainComplete = 0;
+        foreach ($roster as $entry) {
+            if (!empty($entry['is_reserve'])) continue;
+            if (!empty($entry['athlete_first']) && !empty($entry['athlete_last']) && !empty($entry['athlete_email']) && !empty($entry['parent_first']) && !empty($entry['parent_email'])) {
+                $mainComplete++;
+            }
+        }
+        $saveExit = !empty($post['save_exit']);
+        if ($mainComplete >= 6) {
+            $this->userModel->update($coachId, ['status'=>'roster_entered']);
+        } else {
+            // Keep status at profile_entered for resume if roster not complete
+            $current = $this->userModel->find($coachId);
+            if (!empty($current) && ($current['status'] ?? '') === 'profile_entered') {
+                // leave as is
+            }
+        }
+
+        if ($saveExit) {
+            // Optional: clear coach session id so login is required again
+            if (session()->has('coach_id')) {
+                session()->remove('coach_id');
+            }
+            return redirect()->to('/login')->with('message','Roster progress saved. Login later to resume Step 3.');
+        }
+
+        // If roster reached threshold go to uploads step, else reload step3 for further entries
+        if ($mainComplete >= 6) {
+            return redirect()->to('/register/coach/step4?coach_id='.$coachId);
+        }
+        return redirect()->to('/register/coach/step3?coach_id='.$coachId)->with('message','Partial roster saved. Add remaining athletes.');
     }
 
     // Coach Step4: uploads + finalize
@@ -376,26 +488,33 @@ class RegisterController extends Controller
         $id = $post['parent_id'] ?? null;
         if (!$id) return redirect()->back()->with('error','Missing parent id');
         $rules = [
-            'first_name'=>'required','last_name'=>'required','email'=>'required|valid_email',
-            'password'=>'required|min_length[8]','password_confirm'=>'required|matches[password]'
+            'first_name' => 'required',
+            'last_name' => 'required',
+            'email' => 'required|valid_email',
+            'password' => 'required|min_length[8]',
+            'password_confirm' => 'required|matches[password]',
+            'address_line1' => 'required',
+            'city' => 'required',
+            'state' => 'required',
+            'zip_code' => 'required'
         ];
         if (!$this->validate($rules)) {
             $parent = $this->userModel->find($id);
             return view('register/parent_step2', ['parent'=>$parent,'validation'=>$this->validator,'error'=>'Fix errors','currentStep'=>2]);
         }
         $update = [
-            'first_name'=>$post['first_name'],
-            'middle_name'=>$post['middle_name'] ?? null,
-            'last_name'=>$post['last_name'],
-            'email'=>$post['email'],
-            'dob'=>$post['dob'] ?? null,
-            'phone'=>$post['phone'] ?? null,
-            'address_line1'=>$post['address_line1'] ?? null,
-            'address_line2'=>$post['address_line2'] ?? null,
-            'city'=>$post['city'] ?? null,
-            'state'=>$post['state'] ?? null,
-            'zip_code'=>$post['zip_code'] ?? null,
-            'status'=>'parent_profile_entered'
+            'first_name' => $post['first_name'],
+            'middle_name' => $post['middle_name'] ?? null,
+            'last_name' => $post['last_name'],
+            'email' => $post['email'],
+            'dob' => $post['dob'] ?? null,
+            'phone' => $post['phone'] ?? null,
+            'address_line1' => $post['address_line1'],
+            'address_line2' => $post['address_line2'] ?? null,
+            'city' => $post['city'],
+            'state' => $post['state'],
+            'zip_code' => $post['zip_code'],
+            'status' => 'parent_profile_entered'
         ];
         $update['password_hash'] = password_hash($post['password'], PASSWORD_DEFAULT);
         $this->userModel->update($id,$update);
@@ -487,16 +606,25 @@ class RegisterController extends Controller
     {
         $email = trim($this->request->getPost('email') ?? '');
         $code  = trim($this->request->getPost('invitation_code') ?? '');
-        if ($email === '' || $code === '') {
-            return view('register/athlete_step1', ['error'=>'Email & code required','currentStep'=>1]);
+        $fieldErrors = [];
+        if ($email === '') {
+            $fieldErrors['email'] = 'Email required';
+        }
+        if ($code === '') {
+            $fieldErrors['invitation_code'] = 'Invitation code required';
+        }
+        if ($fieldErrors) {
+            return view('register/athlete_step1', ['fieldErrors'=>$fieldErrors,'currentStep'=>1]);
         }
         $athleteRoleId = roleId('athlete') ?? 3;
         $athlete = $this->userModel->where('role_id',$athleteRoleId)->where('email',$email)->where('invitation_code',$code)->first();
         if (!$athlete) {
-            return view('register/athlete_step1', ['error'=>'Invalid invitation','currentStep'=>1]);
+            $fieldErrors['invitation_code'] = 'Code or email incorrect';
+            return view('register/athlete_step1', ['fieldErrors'=>$fieldErrors,'currentStep'=>1]);
         }
         if (!empty($athlete['expiry_date']) && strtotime($athlete['expiry_date']) < time()) {
-            return view('register/athlete_step1', ['error'=>'Invitation expired','currentStep'=>1]);
+            $fieldErrors['invitation_code'] = 'Invitation expired';
+            return view('register/athlete_step1', ['fieldErrors'=>$fieldErrors,'currentStep'=>1]);
         }
         return redirect()->to('/register/athlete/step2?athlete_id='.$athlete['id']);
     }
@@ -515,27 +643,43 @@ class RegisterController extends Controller
         $id = $post['athlete_id'] ?? null;
         if (!$id) return redirect()->back()->with('error','Missing athlete id');
         $rules = [
-            'first_name'=>'required','last_name'=>'required','email'=>'required|valid_email',
-            'password'=>'required|min_length[8]','password_confirm'=>'required|matches[password]',
-            'dob'=>'required'
+            'first_name' => 'required',
+            'last_name' => 'required',
+            'email' => 'required|valid_email',
+            'password' => 'required|min_length[8]',
+            'password_confirm' => 'required|matches[password]',
+            'dob' => 'required',
+            'address_line1' => 'required',
+            'city' => 'required',
+            'state' => 'required',
+            'zip_code' => 'required'
         ];
         if (!$this->validate($rules)) {
             $athlete = $this->userModel->find($id);
             return view('register/athlete_step2',['athlete'=>$athlete,'validation'=>$this->validator,'error'=>'Fix errors','currentStep'=>2]);
         }
+        // Extra age range validation: DOB must be between 2009-05-31 and 2011-11-01 inclusive
+        $dob = $post['dob'] ?? '';
+        $min = strtotime('2009-05-31');
+        $max = strtotime('2011-11-01');
+        $dobTs = strtotime($dob);
+        if (!$dobTs || $dobTs < $min || $dobTs > $max) {
+            $athlete = $this->userModel->find($id);
+            return view('register/athlete_step2',[ 'athlete'=>$athlete, 'error'=>'DOB must be between May 31, 2009 and Nov 1, 2011', 'currentStep'=>2]);
+        }
         $update = [
-            'first_name'=>$post['first_name'],
-            'middle_name'=>$post['middle_name'] ?? null,
-            'last_name'=>$post['last_name'],
-            'email'=>$post['email'],
-            'dob'=>$post['dob'] ?? null,
-            'phone'=>$post['phone'] ?? null,
-            'address_line1'=>$post['address_line1'] ?? null,
-            'address_line2'=>$post['address_line2'] ?? null,
-            'city'=>$post['city'] ?? null,
-            'state'=>$post['state'] ?? null,
-            'zip_code'=>$post['zip_code'] ?? null,
-            'status'=>'athlete_profile_entered'
+            'first_name' => $post['first_name'],
+            'middle_name' => $post['middle_name'] ?? null,
+            'last_name' => $post['last_name'],
+            'email' => $post['email'],
+            'dob' => $post['dob'] ?? null,
+            'phone' => $post['phone'] ?? null,
+            'address_line1' => $post['address_line1'],
+            'address_line2' => $post['address_line2'] ?? null,
+            'city' => $post['city'],
+            'state' => $post['state'],
+            'zip_code' => $post['zip_code'],
+            'status' => 'athlete_profile_entered'
         ];
         $update['password_hash'] = password_hash($post['password'], PASSWORD_DEFAULT);
         $this->userModel->update($id,$update);
